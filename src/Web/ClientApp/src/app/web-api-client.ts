@@ -15,6 +15,79 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
+export interface IRawVideosClient {
+    getRawVideosWithPagination(): Observable<RawVideoDto[]>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class RawVideosClient implements IRawVideosClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getRawVideosWithPagination(): Observable<RawVideoDto[]> {
+        let url_ = this.baseUrl + "/api/RawVideos";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRawVideosWithPagination(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRawVideosWithPagination(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RawVideoDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RawVideoDto[]>;
+        }));
+    }
+
+    protected processGetRawVideosWithPagination(response: HttpResponseBase): Observable<RawVideoDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RawVideoDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface ITodoItemsClient {
     getTodoItemsWithPagination(listId: number, pageNumber: number, pageSize: number): Observable<PaginatedListOfTodoItemBriefDto>;
     createTodoItem(command: CreateTodoItemCommand): Observable<number>;
@@ -590,6 +663,94 @@ export class WeatherForecastsClient implements IWeatherForecastsClient {
         }
         return _observableOf(null as any);
     }
+}
+
+export class RawVideoDto implements IRawVideoDto {
+    rawvideoid?: number;
+    rawvideoname?: string;
+    durationtime?: number;
+    filename?: string;
+    directory?: string;
+    ext?: string;
+    resolution?: string;
+    createdate?: Date;
+    updatedate?: Date;
+    createuser?: string;
+    updateuser?: string;
+    isdelete?: boolean | undefined;
+    deletedate?: Date | undefined;
+    deleteuser?: string | undefined;
+
+    constructor(data?: IRawVideoDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.rawvideoid = _data["rawvideoid"];
+            this.rawvideoname = _data["rawvideoname"];
+            this.durationtime = _data["durationtime"];
+            this.filename = _data["filename"];
+            this.directory = _data["directory"];
+            this.ext = _data["ext"];
+            this.resolution = _data["resolution"];
+            this.createdate = _data["createdate"] ? new Date(_data["createdate"].toString()) : <any>undefined;
+            this.updatedate = _data["updatedate"] ? new Date(_data["updatedate"].toString()) : <any>undefined;
+            this.createuser = _data["createuser"];
+            this.updateuser = _data["updateuser"];
+            this.isdelete = _data["isdelete"];
+            this.deletedate = _data["deletedate"] ? new Date(_data["deletedate"].toString()) : <any>undefined;
+            this.deleteuser = _data["deleteuser"];
+        }
+    }
+
+    static fromJS(data: any): RawVideoDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RawVideoDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["rawvideoid"] = this.rawvideoid;
+        data["rawvideoname"] = this.rawvideoname;
+        data["durationtime"] = this.durationtime;
+        data["filename"] = this.filename;
+        data["directory"] = this.directory;
+        data["ext"] = this.ext;
+        data["resolution"] = this.resolution;
+        data["createdate"] = this.createdate ? this.createdate.toISOString() : <any>undefined;
+        data["updatedate"] = this.updatedate ? this.updatedate.toISOString() : <any>undefined;
+        data["createuser"] = this.createuser;
+        data["updateuser"] = this.updateuser;
+        data["isdelete"] = this.isdelete;
+        data["deletedate"] = this.deletedate ? this.deletedate.toISOString() : <any>undefined;
+        data["deleteuser"] = this.deleteuser;
+        return data;
+    }
+}
+
+export interface IRawVideoDto {
+    rawvideoid?: number;
+    rawvideoname?: string;
+    durationtime?: number;
+    filename?: string;
+    directory?: string;
+    ext?: string;
+    resolution?: string;
+    createdate?: Date;
+    updatedate?: Date;
+    createuser?: string;
+    updateuser?: string;
+    isdelete?: boolean | undefined;
+    deletedate?: Date | undefined;
+    deleteuser?: string | undefined;
 }
 
 export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {

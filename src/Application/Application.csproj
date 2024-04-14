@@ -16,4 +16,9 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="RawVideos\Commands\" />
+    <Folder Include="RawVideos\EventHandlers\" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,18 @@
+<h1>Quản lý Videos </h1>
+
+<p *ngIf="!rawVideos"><em>Loading...</em></p>
+
+<div *ngIf="rawVideos">
+  <table class="table table-striped" aria-labelledby="tableLabel" *ngIf="rawVideos.length">
+    <thead>
+      <tr>
+        <th>Mã</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let video of rawVideos">
+        <td>{{ video.rawvideoid }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

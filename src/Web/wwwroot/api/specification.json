@@ -6,6 +6,29 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/RawVideos": {
+      "get": {
+        "tags": [
+          "RawVideos"
+        ],
+        "operationId": "GetRawVideosWithPagination",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RawVideoDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -323,6 +346,62 @@
   },
   "components": {
     "schemas": {
+      "RawVideoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "rawvideoid": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rawvideoname": {
+            "type": "string"
+          },
+          "durationtime": {
+            "type": "number",
+            "format": "double"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "directory": {
+            "type": "string"
+          },
+          "ext": {
+            "type": "string"
+          },
+          "resolution": {
+            "type": "string"
+          },
+          "createdate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createuser": {
+            "type": "string"
+          },
+          "updateuser": {
+            "type": "string"
+          },
+          "isdelete": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "deletedate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "deleteuser": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "PaginatedListOfTodoItemBriefDto": {
         "type": "object",
         "additionalProperties": false,
