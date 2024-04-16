@@ -1,17 +1,45 @@
-<h1>Quản lý Videos </h1>
+<h1>Quản lý Videos</h1>
 
 <p *ngIf="!rawVideos"><em>Loading...</em></p>
 
 <div *ngIf="rawVideos">
-  <table class="table table-striped" aria-labelledby="tableLabel" *ngIf="rawVideos.length">
+  <table
+    class="table table-hover table-bordered table-striped"
+    aria-labelledby="tableLabel"
+    *ngIf="rawVideos.length"
+  >
     <thead>
       <tr>
-        <th>Mã</th>
+        <th>#</th>
+        <th>Tên videos</th>
+        <th>Thời gian</th>
+        <th>Tên file</th>
+        <th>Đường dẫn</th>
+        <th>Extencion</th>
+        <th>Resolution</th>
+        <th>Người cập nhật</th>
+        <th>Thời gian cập nhật</th>
+        <th>View detail</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let video of rawVideos">
         <td>{{ video.rawvideoid }}</td>
+        <td>{{ video.rawvideoname }}</td>
+        <td>{{ video.durationtime }}</td>
+        <td>{{ video.filename }}</td>
+        <td>{{ video.directory }}</td>
+        <td>{{ video.ext }}</td>
+        <td>{{ video.resolution }}</td>
+        <td>{{ video.createuser }}</td>
+        <td>{{ video.createdate | date: 'dd/MM/yyyy HH:mm' }}</td>
+        <td>
+          <a [attr.href]="'video-management/'+video.rawvideoid"
+          [attr.aria-controls]="video.rawvideoid"
+          role="tab"
+          data-toggle="tab"
+          target="_blank">Link</a>
+        </td>
       </tr>
     </tbody>
   </table>
